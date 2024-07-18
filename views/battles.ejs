@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Battles</title>
+</head>
+<body>
+    <h1>Battles</h1>
+    <ul>
+        <% battles.forEach(battle => { %>
+            <li>
+                <%= battle.trainer1_name %> vs <%= battle.trainer2_name %> on <%= battle.battle_date %>
+                <%= battle.winner_id ? `(Winner: Trainer ${battle.winner_id})` : '' %>
+            </li>
+        <% }); %>
+    </ul>
+    <a href="/battles/new">Start a New Battle</a>
+</body>
+</html>

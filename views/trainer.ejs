@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Trainer Details</title>
+</head>
+<body>
+    <h1><%= trainer.name %></h1>
+    <form action="/trainers/<%= trainer.id %>/delete" method="POST">
+        <button type="submit">Delete Trainer</button>
+    </form>
+    <a href="/trainers">Back to Trainers</a>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Available Pokémon</title>
+</head>
+<body>
+    <h1>Available Pokémon</h1>
+    <ul>
+        <% pokemons.forEach(pokemon => { %>
+            <li><%= pokemon.name %> (Type: <%= pokemon.type %>)</li>
+        <% }); %>
+    </ul>
+    <a href="/battles/new">Start a New Battle</a>
+</body>
+</html>

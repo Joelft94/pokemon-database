@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>New Battle</title>
+</head>
+<body>
+    <h1>Create New Battle</h1>
+    <form action="/battles" method="POST">
+        <label for="trainer1">Trainer 1:</label>
+        <select id="trainer1" name="trainer1_id" required>
+            <% trainers.forEach(trainer => { %>
+                <option value="<%= trainer.id %>"><%= trainer.name %></option>
+            <% }); %>
+        </select>
+
+        <label for="trainer2">Trainer 2:</label>
+        <select id="trainer2" name="trainer2_id" required>
+            <% trainers.forEach(trainer => { %>
+                <option value="<%= trainer.id %>"><%= trainer.name %></option>
+            <% }); %>
+        </select>
+
+        <label for="battle_date">Battle Date:</label>
+        <input type="date" id="battle_date" name="battle_date" required>
+
+        <h2>Select Pokémon for Trainer 1</h2>
+        <% pokemons.forEach(pokemon => { %>
+            <input type="checkbox" id="trainer1_pokemon<%= pokemon.id %>" name="trainer1_pokemons" value="<%= pokemon.id %>">
+            <label for="trainer1_pokemon<%= pokemon.id %>"><%= pokemon.name %></label><br>
+        <% }); %>
+
+        <h2>Select Pokémon for Trainer 2</h2>
+        <% pokemons.forEach(pokemon => { %>
+            <input type="checkbox" id="trainer2_pokemon<%= pokemon.id %>" name="trainer2_pokemons" value="<%= pokemon.id %>">
+            <label for="trainer2_pokemon<%= pokemon.id %>"><%= pokemon.name %></label><br>
+        <% }); %>
+
+        <button type="submit">Create Battle</button>
+    </form>
+</body>
+</html>
