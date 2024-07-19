@@ -23,6 +23,7 @@
         <label for="battle_date">Battle Date:</label>
         <input type="date" id="battle_date" name="battle_date" required>
 
+        
         <h2>Select Pokémon for Trainer 1</h2>
         <% pokemons.forEach(pokemon => { %>
             <input type="checkbox" id="trainer1_pokemon<%= pokemon.id %>" name="trainer1_pokemons" value="<%= pokemon.id %>">
@@ -34,7 +35,7 @@
             <input type="checkbox" id="trainer2_pokemon<%= pokemon.id %>" name="trainer2_pokemons" value="<%= pokemon.id %>">
             <label for="trainer2_pokemon<%= pokemon.id %>"><%= pokemon.name %></label><br>
         <% }); %>
-
+        
         <button type="submit">Create Battle</button>
     </form>
 </body>

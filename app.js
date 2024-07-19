@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const pool = require('./db');
 
+
 const app = express();
 const PORT = 3000;
 
@@ -24,6 +25,9 @@ app.get('/trainers', async (req, res) => {
         res.send("Error " + err);
     }
 });
+
+
+
 
 // Get form to add new trainer
 app.get('/trainers/new', (req, res) => {
@@ -69,7 +73,7 @@ app.post('/trainers/:id/delete', async (req, res) => {
 
 app.get('/pokemons', async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM "Pokemons"');
+        const result = await pool.query('SELECT * FROM "Pokemons" ORDER BY number');
         res.render('pokemons', { pokemons: result.rows });
     } catch (err) {
         console.error(err);
@@ -81,7 +85,7 @@ app.get('/pokemons', async (req, res) => {
 app.get('/battles/new', async (req, res) => {
     try {
         const trainers = await pool.query('SELECT * FROM "Trainers"');
-        const pokemons = await pool.query('SELECT * FROM "Pokemons"');
+        const pokemons = await pool.query('SELECT * FROM "Pokemons" ORDER BY number');
         res.render('new_battle', { trainers: trainers.rows, pokemons: pokemons.rows });
     } catch (err) {
         console.error(err);
@@ -140,17 +144,52 @@ app.post('/battles', async (req, res) => {
 app.get('/battles', async (req, res) => {
     try {
         const result = await pool.query(`
-            SELECT b.id, t1.name as trainer1_name, t2.name as trainer2_name, b.battle_date, b.winner_id
+            SELECT 
+                b.id, 
+                t1.id AS trainer1_id, 
+                t1.name AS trainer1_name, 
+                t2.id AS trainer2_id, 
+                t2.name AS trainer2_name, 
+                b.battle_date, 
+                b.winner_id,
+                winner.name AS winner_name
             FROM "Battles" b
             JOIN "Trainers" t1 ON b.trainer1_id = t1.id
             JOIN "Trainers" t2 ON b.trainer2_id = t2.id
+            LEFT JOIN "Trainers" winner ON b.winner_id = winner.id;
         `);
+
         res.render('battles', { battles: result.rows });
     } catch (err) {
         console.error(err);
         res.send("Error " + err);
     }
 });
+
+
+
+app.post('/update_winner', async (req, res) => {
+    try {
+        const { battle_id, winner_id } = req.body;
+        console.log('Form data:', req.body); // Log form data
+        console.log(`Battle ID: ${battle_id}`);
+        console.log(`Winner ID: ${winner_id}`);
+
+        // Ensure winner_id is an integer
+        const winnerIdInt = parseInt(winner_id, 10) || null;
+        console.log(`Parsed Winner ID: ${winnerIdInt}`);
+        
+        // Update the database record
+        await pool.query('UPDATE "Battles" SET winner_id = $1 WHERE id = $2', [winnerIdInt, battle_id]);
+
+        res.redirect('/battles');
+    } catch (err) {
+        console.error(err);
+        res.send("Error " + err);
+    }
+});
+
+
 
 
 

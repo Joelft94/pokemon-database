@@ -9,10 +9,21 @@
         <% battles.forEach(battle => { %>
             <li>
                 <%= battle.trainer1_name %> vs <%= battle.trainer2_name %> on <%= battle.battle_date %>
-                <%= battle.winner_id ? `(Winner: Trainer ${battle.winner_id})` : '' %>
+                <%= battle.winner_name ? `(Winner: ${battle.winner_name})` : '' %>
+                
+                <form action="/update_winner" method="POST">
+                    <input type="hidden" name="battle_id" value="<%= battle.id %>">
+                    <select name="winner_id">
+                        <option value="">Select Winner</option>
+                        <option value="<%= battle.trainer1_id %>" <%= battle.winner_id == battle.trainer1_id ? 'selected' : '' %>> <%= battle.trainer1_name %> </option>
+                        <option value="<%= battle.trainer2_id %>" <%= battle.winner_id == battle.trainer2_id ? 'selected' : '' %>> <%= battle.trainer2_name %> </option>
+                    </select>
+                    <input type="submit" value="Update Winner">
+                </form>
             </li>
         <% }); %>
     </ul>
+
     <a href="/battles/new">Start a New Battle</a>
 </body>
 </html>
