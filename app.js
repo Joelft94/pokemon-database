@@ -1,16 +1,15 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const pool = require('./db');
-
+const pool = require('./db'); // Ensure you have your database connection setup
 
 const app = express();
 const PORT = 3000;
 
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 
-
+// Home route
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/public/index.html');
 });
@@ -25,9 +24,6 @@ app.get('/trainers', async (req, res) => {
         res.send("Error " + err);
     }
 });
-
-
-
 
 // Get form to add new trainer
 app.get('/trainers/new', (req, res) => {
@@ -64,8 +60,6 @@ app.post('/trainers/:id/delete', async (req, res) => {
     const client = await pool.connect();
     try {
         await client.query('BEGIN');
-        // Adjust column names and table names as necessary
-        
         await client.query('DELETE FROM "Teams" WHERE "trainer_id" = $1', [id]);
         await client.query('DELETE FROM "Battles" WHERE "trainer1_id" = $1 OR "trainer2_id" = $1', [id]);
         await client.query('DELETE FROM "Trainers" WHERE "id" = $1', [id]);
@@ -80,20 +74,34 @@ app.post('/trainers/:id/delete', async (req, res) => {
     }
 });
 
-
-
-
+// Get all pokemons
 app.get('/pokemons', async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM "Pokemons" ORDER BY number');
+        const result = await pool.query('SELECT * FROM "Pokemons"');
         res.render('pokemons', { pokemons: result.rows });
     } catch (err) {
         console.error(err);
-        res.send("Error " + err);
+        res.status(500).send("Error " + err);
     }
 });
 
+// Get a specific pokemon by id
+app.get('/pokemons/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const result = await pool.query('SELECT * FROM "Pokemons" WHERE number = $1', [id]);
+        if (result.rows.length > 0) {
+            res.json(result.rows[0]);
+        } else {
+            res.status(404).send("Pokémon not found");
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error " + err);
+    }
+});
 
+// Get form to create a new battle
 app.get('/battles/new', async (req, res) => {
     try {
         const trainers = await pool.query('SELECT * FROM "Trainers"');
@@ -105,54 +113,73 @@ app.get('/battles/new', async (req, res) => {
     }
 });
 
+// Create a new battle
 app.post('/battles', async (req, res) => {
     try {
-        const { trainer1_id, trainer2_id, trainer1_pokemons, trainer2_pokemons, battle_date } = req.body;
+        let { trainer1_id, trainer2_id, trainer1_pokemons, trainer2_pokemons, battle_date } = req.body;
 
-        // Ensure arrays and exactly 6 Pokémon selected
-        if (!Array.isArray(trainer1_pokemons) || !Array.isArray(trainer2_pokemons) || trainer1_pokemons.length !== 6 || trainer2_pokemons.length !== 6) {
-            return res.status(400).send('Each trainer must select exactly 6 Pokémon.');
+        // Ensure Pokémon IDs are integers
+        trainer1_pokemons = trainer1_pokemons.map(id => parseInt(id)).filter(id => !isNaN(id));
+        trainer2_pokemons = trainer2_pokemons.map(id => parseInt(id)).filter(id => !isNaN(id));
+
+        // Validate that 6 Pokémon are selected for each trainer
+        if (trainer1_pokemons.length !== 6 || trainer2_pokemons.length !== 6) {
+            return res.status(400).redirect('/battles/new?error=6-pokemons-required');
         }
 
-        // Ensure no duplicate Pokémon in either team
+        // Validate no duplicates within each trainer's team
         const uniqueTrainer1Pokemons = new Set(trainer1_pokemons);
         const uniqueTrainer2Pokemons = new Set(trainer2_pokemons);
         if (uniqueTrainer1Pokemons.size !== 6 || uniqueTrainer2Pokemons.size !== 6) {
-            return res.status(400).send('No duplicate Pokémon allowed in a team.');
+            return res.status(400).redirect('/battles/new?error=no-duplicates-allowed');
         }
 
-        // Ensure no Pokémon selected by both trainers
-        const intersection = trainer1_pokemons.filter(value => trainer2_pokemons.includes(value));
+        // Validate no Pokémon overlap between trainers
+        const intersection = trainer1_pokemons.filter(id => trainer2_pokemons.includes(id));
         if (intersection.length > 0) {
-            return res.status(400).send('Pokémon cannot be selected by both trainers.');
+            return res.status(400).redirect('/battles/new?error=no-overlap-allowed');
         }
 
         // Insert the battle
-        const battleResult = await pool.query('INSERT INTO "Battles" (trainer1_id, trainer2_id, battle_date) VALUES ($1, $2, $3) RETURNING id', [trainer1_id, trainer2_id, battle_date]);
+        const battleResult = await pool.query(
+            'INSERT INTO "Battles" (trainer1_id, trainer2_id, battle_date) VALUES ($1, $2, $3) RETURNING id',
+            [trainer1_id, trainer2_id, battle_date]
+        );
         const battleId = battleResult.rows[0].id;
 
         // Insert teams for trainer 1
-        const team1Result = await pool.query('INSERT INTO "Teams" (trainer_id, battle_id) VALUES ($1, $2) RETURNING id', [trainer1_id, battleId]);
+        const team1Result = await pool.query(
+            'INSERT INTO "Teams" (trainer_id, battle_id) VALUES ($1, $2) RETURNING id',
+            [trainer1_id, battleId]
+        );
         const team1Id = team1Result.rows[0].id;
-        for (let pokemonId of trainer1_pokemons) {
-            await pool.query('INSERT INTO "team_pokemons" (team_id, pokemon_id) VALUES ($1, $2)', [team1Id, pokemonId]);
-        }
+
+        const team1InsertPromises = trainer1_pokemons.map(pokemonId =>
+            pool.query('INSERT INTO "team_pokemons" (team_id, pokemon_id) VALUES ($1, $2)', [team1Id, pokemonId])
+        );
+        await Promise.all(team1InsertPromises);
 
         // Insert teams for trainer 2
-        const team2Result = await pool.query('INSERT INTO "Teams" (trainer_id, battle_id) VALUES ($1, $2) RETURNING id', [trainer2_id, battleId]);
+        const team2Result = await pool.query(
+            'INSERT INTO "Teams" (trainer_id, battle_id) VALUES ($1, $2) RETURNING id',
+            [trainer2_id, battleId]
+        );
         const team2Id = team2Result.rows[0].id;
-        for (let pokemonId of trainer2_pokemons) {
-            await pool.query('INSERT INTO "team_pokemons" (team_id, pokemon_id) VALUES ($1, $2)', [team2Id, pokemonId]);
-        }
 
+        const team2InsertPromises = trainer2_pokemons.map(pokemonId =>
+            pool.query('INSERT INTO "team_pokemons" (team_id, pokemon_id) VALUES ($1, $2)', [team2Id, pokemonId])
+        );
+        await Promise.all(team2InsertPromises);
+
+        // Redirect to battles page on success
         res.redirect('/battles');
     } catch (err) {
         console.error(err);
-        res.send("Error " + err);
+        res.status(500).redirect('/battles?error=internal-server-error');
     }
 });
 
-
+// Get all battles
 app.get('/battles', async (req, res) => {
     try {
         const result = await pool.query(`
@@ -178,8 +205,7 @@ app.get('/battles', async (req, res) => {
     }
 });
 
-
-
+// Update battle winner
 app.post('/update_winner', async (req, res) => {
     try {
         const { battle_id, winner_id } = req.body;
@@ -200,11 +226,6 @@ app.post('/update_winner', async (req, res) => {
         res.send("Error " + err);
     }
 });
-
-
-
-
-
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);

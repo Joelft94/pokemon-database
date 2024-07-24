@@ -2,41 +2,116 @@
 <html>
 <head>
     <title>New Battle</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h1>Create New Battle</h1>
-    <form action="/battles" method="POST">
-        <label for="trainer1">Trainer 1:</label>
-        <select id="trainer1" name="trainer1_id" required>
-            <% trainers.forEach(trainer => { %>
-                <option value="<%= trainer.id %>"><%= trainer.name %></option>
-            <% }); %>
-        </select>
+<body class="bg-[url('/images/background.jpg')] bg-cover">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="flex flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 w-64">
+            <div class="flex h-16 shrink-0 items-center">
+                <a href="/" class="group flex gap-x-3 rounded-md text-sm font-bold leading-6 text-white hover:bg-gray-800 hover:text-white ml-2">
+                    <img class="h-10 w-auto" src="/images/pikachulogo.png" alt="Pikachu Logo">
+                    Pokémon Battle App
+                </a>
+            </div>
+            <nav class="flex flex-1 flex-col">
+                <ul role="list" class="flex flex-1 flex-col gap-y-7">
+                    <li>
+                        <ul role="list" class="-mx-2 space-y-1">
+                            <li>
+                                <a href="/pokemons" class="group flex gap-x-3 rounded-md bg-gray-800 p-2 text-sm font-semibold leading-6 text-white">
+                                    <img src="/images/pokeball.webp" alt="pokeball" class="h-10 w-10 rounded-lg ml-2">
+                                    View Pokémon
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/trainers" class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-800 hover:text-white">
+                                    <img src="/images/trainer.png" alt="trainer" class="h-12 w-12 rounded-full ml-1">
+                                    View Trainers
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/trainers/new" class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-800 hover:text-white">
+                                    <img src="/images/trainer_plus.png" alt="trainer" class="h-12 w-12 ml-1">
+                                    Create New Trainer
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/battles" class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-800 hover:text-white">
+                                    <img src="/images/battle.png" alt="battle" class="h-10 w-10 rounded-full bg-white ml-2">
+                                    View Battles
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/battles/new" class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-800 hover:text-white">
+                                    <img src="/images/battle_plus.png" alt="battle" class="h-12 w-12 ml-1">
+                                    New Battle
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </div>
 
-        <label for="trainer2">Trainer 2:</label>
-        <select id="trainer2" name="trainer2_id" required>
-            <% trainers.forEach(trainer => { %>
-                <option value="<%= trainer.id %>"><%= trainer.name %></option>
-            <% }); %>
-        </select>
+        <!-- Main Content -->
+        <main class="flex-1 p-6 bg-gray-800 bg-opacity-75 rounded-lg mx-4 my-4">
+            <h1 class="text-2xl font-bold mb-4 text-white">Create New Battle</h1>
+            <form action="/battles" method="POST" class="space-y-6">
+                <div>
+                    <label for="trainer1" class="text-white">Trainer 1:</label>
+                    <select id="trainer1" name="trainer1_id" class="bg-gray-700 text-white p-2 rounded" required>
+                        <% trainers.forEach(trainer => { %>
+                            <option value="<%= trainer.id %>"><%= trainer.name %></option>
+                        <% }); %>
+                    </select>
+                </div>
+                <div>
+                    <label for="trainer2" class="text-white">Trainer 2:</label>
+                    <select id="trainer2" name="trainer2_id" class="bg-gray-700 text-white p-2 rounded" required>
+                        <% trainers.forEach(trainer => { %>
+                            <option value="<%= trainer.id %>"><%= trainer.name %></option>
+                        <% }); %>
+                    </select>
+                </div>
+                <div>
+                    <label for="battle_date" class="text-white">Battle Date:</label>
+                    <input type="date" id="battle_date" name="battle_date" class="bg-gray-700 text-white p-2 rounded" required>
+                </div>
 
-        <label for="battle_date">Battle Date:</label>
-        <input type="date" id="battle_date" name="battle_date" required>
+                <h2 class="text-xl font-semibold text-white">Select Pokémon for Trainer 1</h2>
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <% for (let i = 1; i <= 6; i++) { %>
+                        <div>
+                            <label for="trainer1_pokemon<%= i %>" class="text-white">Pokémon <%= i %>:</label>
+                            <select id="trainer1_pokemon<%= i %>" name="trainer1_pokemons[]" class="bg-gray-700 text-white p-2 rounded">
+                                <option value="">--Select a Pokémon--</option>
+                                <% pokemons.forEach(pokemon => { %>
+                                    <option value="<%= pokemon.id %>"><%= pokemon.name %></option>
+                                <% }); %>
+                            </select>
+                        </div>
+                    <% } %>
+                </div>
 
-        
-        <h2>Select Pokémon for Trainer 1</h2>
-        <% pokemons.forEach(pokemon => { %>
-            <input type="checkbox" id="trainer1_pokemon<%= pokemon.id %>" name="trainer1_pokemons" value="<%= pokemon.id %>">
-            <label for="trainer1_pokemon<%= pokemon.id %>"><%= pokemon.name %></label><br>
-        <% }); %>
+                <h2 class="text-xl font-semibold text-white">Select Pokémon for Trainer 2</h2>
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <% for (let i = 1; i <= 6; i++) { %>
+                        <div>
+                            <label for="trainer2_pokemon<%= i %>" class="text-white">Pokémon <%= i %>:</label>
+                            <select id="trainer2_pokemon<%= i %>" name="trainer2_pokemons[]" class="bg-gray-700 text-white p-2 rounded">
+                                <option value="">--Select a Pokémon--</option>
+                                <% pokemons.forEach(pokemon => { %>
+                                    <option value="<%= pokemon.id %>"><%= pokemon.name %></option>
+                                <% }); %>
+                            </select>
+                        </div>
+                    <% } %>
+                </div>
 
-        <h2>Select Pokémon for Trainer 2</h2>
-        <% pokemons.forEach(pokemon => { %>
-            <input type="checkbox" id="trainer2_pokemon<%= pokemon.id %>" name="trainer2_pokemons" value="<%= pokemon.id %>">
-            <label for="trainer2_pokemon<%= pokemon.id %>"><%= pokemon.name %></label><br>
-        <% }); %>
-        
-        <button type="submit">Create Battle</button>
-    </form>
+                <button type="submit" class="bg-blue-500 text-white p-2 rounded">Create Battle</button>
+            </form>
+        </main>
+    </div>
 </body>
 </html>

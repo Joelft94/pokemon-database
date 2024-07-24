@@ -2,14 +2,109 @@
 <html>
 <head>
     <title>Available Pokémon</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        function displayPokemon(pokemon) {
+            const pokemonInfo = JSON.parse(pokemon);
+
+            
+            const nameElem = document.getElementById('pokemon-name');
+            const frontImgElem = document.getElementById('pokemon-front');
+            const backImgElem = document.getElementById('pokemon-back');
+
+            if (pokemonInfo && pokemonInfo.name) {
+                nameElem.innerText = pokemonInfo.name;
+                frontImgElem.src = pokemonInfo.front;
+                backImgElem.src = pokemonInfo.back;
+
+                
+                nameElem.style.display = 'block';
+                frontImgElem.style.display = 'block';
+                backImgElem.style.display = 'block';
+            } else {
+                nameElem.innerText = '';
+                frontImgElem.src = '';
+                backImgElem.src = '';
+
+                nameElem.style.display = 'none';
+                frontImgElem.style.display = 'none';
+                backImgElem.style.display = 'none';
+            }
+        }
+    </script>
 </head>
-<body>
-    <h1>Available Pokémon</h1>
-    <ul>
-        <% pokemons.forEach(pokemon => { %>
-            <li><%= pokemon.name %> (Type: <%= pokemon.type %>)</li>
-        <% }); %>
-    </ul>
-    <a href="/battles/new">Start a New Battle</a>
+<body class="bg-[url('./images/background.jpg')] bg-cover">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="flex flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 w-64">
+            <div class="flex h-16 shrink-0 items-center">
+                <a href="/" class="group flex gap-x-3 rounded-md text-sm font-bold leading-6 text-white hover:bg-gray-800 hover:text-white ml-2">
+                    <img class="h-10 w-auto" src="./images/pikachulogo.png" alt="Pikachu Logo">
+                    Pokémon Battle App
+                </a>
+            </div>
+            <nav class="flex flex-1 flex-col">
+                <ul role="list" class="flex flex-1 flex-col gap-y-7">
+                    <li>
+                        <ul role="list" class="-mx-2 space-y-1">
+                            <li>
+                                <a href="/pokemons" class="group flex gap-x-3 rounded-md bg-gray-800 p-2 text-sm font-semibold leading-6 text-white">
+                                    <img src="./images/pokeball.webp" alt="pokeball" class="h-10 w-10 rounded-lg ml-2">
+                                    View Pokemon
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/trainers" class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-800 hover:text-white">
+                                    <img src="./images/trainer.png" alt="trainer" class="h-12 w-12 rounded-full ml-1">
+                                    View Trainers
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/trainers/new" class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-800 hover:text-white">
+                                    <img src="./images/trainer_plus.png" alt="trainer" class="h-12 w-12 ml-1">
+                                    Create New Trainer
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/battles" class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-800 hover:text-white">
+                                    <img src="./images/battle.png" alt="battle" class="h-10 w-10 rounded-full bg-white ml-2">
+                                    View Battles
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/battles/new" class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-800 hover:text-white">
+                                    <img src="./images/battle_plus.png" alt="battle" class="h-12 w-12 ml-1">
+                                    New Battle
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6 bg-gray-800 bg-opacity-75 rounded-lg mx-4 my-4">
+            <h1 class="text-2xl font-bold mb-4 text-white">Available Pokémon</h1>
+            <form>
+                <label for="pokemon-select" class="text-white mb-2 block">Select a Pokémon:</label>
+                <select id="pokemon-select" class="bg-gray-700 text-white p-2 rounded" onchange="displayPokemon(this.value)">
+                    <option value="">--Select a Pokémon--</option>
+                    <% pokemons.forEach(pokemon => { %>
+                        <option value='<%= JSON.stringify({ name: pokemon.name, front: pokemon.front, back: pokemon.back }) %>'>
+                            <%= pokemon.name %>
+                        </option>
+                    <% }); %>
+                </select>
+            </form>
+            <div id="pokemon-info" class="mt-4">
+                <h2 id="pokemon-name" class="text-xl font-semibold text-white mb-2" style="display: none;"></h2>
+                <div class="flex space-x-4">
+                    <img id="pokemon-front" class="w-32 h-32 object-cover rounded" alt="Front view of Pokémon" style="display: none;">
+                    <img id="pokemon-back" class="w-32 h-32 object-cover rounded" alt="Back view of Pokémon" style="display: none;">
+                </div>
+            </div>
+        </main>
+    </div>
 </body>
 </html>

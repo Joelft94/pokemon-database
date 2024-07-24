@@ -2,28 +2,81 @@
 <html>
 <head>
     <title>Battles</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h1>Battles</h1>
-    <ul>
-        <% battles.forEach(battle => { %>
-            <li>
-                <%= battle.trainer1_name %> vs <%= battle.trainer2_name %> on <%= battle.battle_date %>
-                <%= battle.winner_name ? `(Winner: ${battle.winner_name})` : '' %>
-                
-                <form action="/update_winner" method="POST">
-                    <input type="hidden" name="battle_id" value="<%= battle.id %>">
-                    <select name="winner_id">
-                        <option value="">Select Winner</option>
-                        <option value="<%= battle.trainer1_id %>" <%= battle.winner_id == battle.trainer1_id ? 'selected' : '' %>> <%= battle.trainer1_name %> </option>
-                        <option value="<%= battle.trainer2_id %>" <%= battle.winner_id == battle.trainer2_id ? 'selected' : '' %>> <%= battle.trainer2_name %> </option>
-                    </select>
-                    <input type="submit" value="Update Winner">
-                </form>
-            </li>
-        <% }); %>
-    </ul>
+<body class="bg-[url('./images/background.jpg')] bg-cover">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="flex flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 w-64">
+            <div class="flex h-16 shrink-0 items-center">
+                <a href="/" class="group flex gap-x-3 rounded-md text-sm font-bold leading-6 text-white hover:bg-gray-800 hover:text-white ml-2">
+                    <img class="h-10 w-auto" src="./images/pikachulogo.png" alt="Pikachu Logo">
+                    Pokémon Battle App
+                </a>
+            </div>
+            <nav class="flex flex-1 flex-col">
+                <ul role="list" class="flex flex-1 flex-col gap-y-7">
+                    <li>
+                        <ul role="list" class="-mx-2 space-y-1">
+                            <li>
+                                <a href="/pokemons" class="group flex gap-x-3 rounded-md bg-gray-800 p-2 text-sm font-semibold leading-6 text-white">
+                                    <img src="./images/pokeball.webp" alt="pokeball" class="h-10 w-10 rounded-lg ml-2">
+                                    View Pokemon
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/trainers" class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-800 hover:text-white">
+                                    <img src="./images/trainer.png" alt="trainer" class="h-12 w-12 rounded-full ml-1">
+                                    View Trainers
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/trainers/new" class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-800 hover:text-white">
+                                    <img src="./images/trainer_plus.png" alt="trainer" class="h-12 w-12 ml-1">
+                                    Create New Trainer
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/battles" class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-800 hover:text-white">
+                                    <img src="./images/battle.png" alt="battle" class="h-10 w-10 rounded-full bg-white ml-2">
+                                    View Battles
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/battles/new" class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-800 hover:text-white">
+                                    <img src="./images/battle_plus.png" alt="battle" class="h-12 w-12 ml-1">
+                                    New Battle
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </div>
 
-    <a href="/battles/new">Start a New Battle</a>
+        <!-- Main Content -->
+        <main class="flex-1 p-6 bg-gray-800 bg-opacity-75 rounded-lg mx-4 my-4 overflow-y-auto">
+            <h1 class="text-2xl font-bold mb-4 text-white">Battles</h1>
+            <ul class="list-disc pl-5 space-y-4">
+                <% battles.forEach(battle => { %>
+                    <li class="text-white">
+                        <%= battle.trainer1_name %> vs <%= battle.trainer2_name %> on <%= battle.battle_date %>
+                        <%= battle.winner_name ? `(Winner: ${battle.winner_name})` : '' %>
+                        
+                        <form action="/update_winner" method="POST" class="text-black mt-2">
+                            <input type="hidden" name="battle_id" value="<%= battle.id %>">
+                            <select name="winner_id" class="bg-gray-700 text-white rounded p-2">
+                                <option value="">Select Winner</option>
+                                <option value="<%= battle.trainer1_id %>" <%= battle.winner_id == battle.trainer1_id ? 'selected' : '' %>><%= battle.trainer1_name %></option>
+                                <option value="<%= battle.trainer2_id %>" <%= battle.winner_id == battle.trainer2_id ? 'selected' : '' %>><%= battle.trainer2_name %></option>
+                            </select>
+                            <input type="submit" value="Update Winner" class="inline-block mt-4 bg-blue-800 text-white rounded p-2">
+                        </form>
+                    </li>
+                <% }); %>
+            </ul>
+            <a href="/battles/new" class="inline-block mt-4 bg-green-500 text-white rounded p-2">Start a New Battle</a>
+        </main>
+    </div>
 </body>
 </html>

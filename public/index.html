@@ -1,18 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pokémon Battle App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
 </head>
-<body>
-    <h1>Welcome to Pokémon Battle App</h1>
-    <ul>
-        <li><a href="/pokemons">View Pokémon</a></li>
-        <li><a href="/battles/new">Create New Battle</a></li>
-        <li><a href="/battles">View Battles</a></li>
-        <li><a href="/trainers">View Trainers</a></li>
-        <li><a href="/trainers/new">Create New Trainer</a></li>
-    </ul>
+<body class="bg-[url('./images/background.jpg')] bg-cover">
+    <div>
+        <div class="flex flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 h-screen max-w-xs w-64">
+
+            <div class="flex h-16 shrink-0 items-center">
+                <a href="/"
+                    class="group flex gap-x-3 rounded-md  text-sm font-bold leading-6 text-white hover:bg-gray-800 hover:text-white ml-2">
+                    <img class="h-10 w-auto" src="./images/pikachulogo.png" alt="Pikachu Logo">
+                    Pokémon Battle App
+                </a>
+            </div>
+            <nav class="flex flex-1 flex-col">
+                <ul role="list" class="flex flex-1 flex-col gap-y-7">
+                    <li>
+                        <ul role="list" class="-mx-2 space-y-1">
+                            <li>
+                                <!-- Current: "bg-gray-800 text-white", Default: "text-gray-400 hover:text-white hover:bg-gray-800" -->
+                                <a href="/pokemons"
+                                    class="group flex gap-x-3 rounded-md bg-gray-800 p-2 text-sm font-semibold leading-6 text-white">
+                                    <img src="./images/pokeball.webp" alt="pokeball" class="h-10 w-10 rounded-lg ml-2">
+                                    View Pokemon
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/trainers"
+                                    class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-800 hover:text-white">
+                                    <img src="./images/trainer.png" alt="trainer" class="h-12 w-12 rounded-full ml-1">
+                                    View Trainers
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/trainers/new"
+                                    class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-800 hover:text-white">
+                                    <img src="./images/trainer_plus.png" alt="trainer" class="h-12 w-12 ml-1">
+                                    Create New Trainer
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/battles"
+                                    class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-800 hover:text-white">
+                                    <img src="./images/battle.png" alt="battle" class="h-10 w-10 rounded-full bg-white ml-2">
+                                    View Battles
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/battles/new"
+                                    class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-800 hover:text-white">
+                                    <img src="./images/battle_plus.png" alt="battle" class="h-12 w-12 ml-1">
+                                    New Battle
+                                </a>
+                            </li>
+
+                        </ul>
+                    </li>
+
+
+                </ul>
+            </nav>
+        </div>
+
+    </div>
 </body>
+
 </html>
