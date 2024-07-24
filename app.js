@@ -60,15 +60,27 @@ app.get('/trainers/:id', async (req, res) => {
 
 // Delete a trainer
 app.post('/trainers/:id/delete', async (req, res) => {
+    const { id } = req.params;
+    const client = await pool.connect();
     try {
-        const { id } = req.params;
-        await pool.query('DELETE FROM "Trainers" WHERE id = $1', [id]);
+        await client.query('BEGIN');
+        // Adjust column names and table names as necessary
+        
+        await client.query('DELETE FROM "Teams" WHERE "trainer_id" = $1', [id]);
+        await client.query('DELETE FROM "Battles" WHERE "trainer1_id" = $1 OR "trainer2_id" = $1', [id]);
+        await client.query('DELETE FROM "Trainers" WHERE "id" = $1', [id]);
+        await client.query('COMMIT');
         res.redirect('/trainers');
     } catch (err) {
+        await client.query('ROLLBACK');
         console.error(err);
-        res.send("Error " + err);
+        res.status(500).send("Error: " + err.message);
+    } finally {
+        client.release();
     }
 });
+
+
 
 
 app.get('/pokemons', async (req, res) => {
